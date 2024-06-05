@@ -5,7 +5,7 @@
 
 // インストラクタ
 GameScene::GameScene() {}
-// デストラクタ
+// デストラクタ 
 GameScene::~GameScene() {
 	delete model_;
 	// ここからAL3の02_01の22をやる
