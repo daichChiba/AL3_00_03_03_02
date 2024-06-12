@@ -4,7 +4,12 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 
-enum class LRDirection { kRight, kLeft };
+
+
+enum class LRDirection { 
+	kRight,
+	kLeft 
+};
 
 /// <summary>
 /// 自キャラ
@@ -57,4 +62,14 @@ private:
 	float turnTimer_ = 0.0f;
 	// 旋回時間<秒>
 	static inline const float kTimeTurn = 0.3f;
+
+	// 設置状況フラグ
+	bool onGround_ = true;
+
+	//　重力加速度（下方向）
+	static inline const float kGravityAcceleration = { 0.05f };
+	//　最大落下速度（下方向）
+	static inline const float kLimitFallSpeed = { 0.5f };
+	//　ジャンプ加速（上方向）
+	static inline const float kJumpAcceleration = { 0.5f };
 };

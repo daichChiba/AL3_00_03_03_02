@@ -74,16 +74,20 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 
 	// 3Dモデルデータの生成
-	model3d_ = Model::CreateFromOBJ("cube");
+	model3d_ = Model::CreateFromOBJ("block",true);
+
+	// 3Dモデルの生成(スカイドーム)
+	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
+
 
 	// 　3Dplayerモデルデータの作成
-	modelPlayer_ = Model::CreateFromOBJ("player");
+	modelPlayer_ = Model::CreateFromOBJ("player",true);
 
 	skydome_ = new Skydome;
 
 	player_ = new Player; //
 	// 座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(3, 3);
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(7, 7);
 	player_->Initialize(modelPlayer_, &viewProjection_, playerPosition);
 
 	mapChipField_ = new MapChipField;
@@ -91,8 +95,6 @@ void GameScene::Initialize() {
 
 	GenerateBlocks();
 
-	// 3Dモデルの生成(スカイドーム)
-	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
 
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
