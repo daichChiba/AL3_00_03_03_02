@@ -80,6 +80,7 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
 
 
+
 	// 　3Dplayerモデルデータの作成
 	modelPlayer_ = Model::CreateFromOBJ("player",true);
 
