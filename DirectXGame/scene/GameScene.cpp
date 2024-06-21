@@ -28,6 +28,8 @@ GameScene::~GameScene() {
 	delete mapChipField_;
 
 	delete debugCamera_;
+
+	delete cameraController_;
 }
 
 void GameScene::GenerateBlocks() {
@@ -36,8 +38,8 @@ void GameScene::GenerateBlocks() {
 	uint32_t kNumBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
 
 	// ブロック１個分の横幅
-	const float kBlockWidth = 2.0f;
-	const float kBlockHeight = 2.0f;
+	const float kBlockWidth = 1.0f;
+	const float kBlockHeight = 1.0f;
 
 	// 要素数を変更する
 	worldTransformBlocks_.resize(kNumBlockVirtical);
@@ -100,6 +102,18 @@ void GameScene::Initialize() {
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
 
+	// カメラコントローラの初期化
+	// カメラコントローラの生成
+	cameraController_ = new CameraController();
+	// 初期化
+	cameraController_->Initialize();
+	// 追従対象をリセット
+	cameraController_->SetTarget(player_);
+	// リセット(瞬間合わせ)
+	cameraController_->Reset();
+
+
+
 	// デバックカメラの生成
 	debugCamera_ = new DebugCamera(640, 360);
 	debugCamera_->SetFarZ(5000000);
@@ -127,8 +141,8 @@ void GameScene::Update() {
 	if (input_->TriggerKey(DIK_0)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
-#endif // DEBUG
-       // カメラの処理
+#endif	// DEBUG
+		// カメラの処理
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
 		// デバックカメラのビュー行列
@@ -137,7 +151,11 @@ void GameScene::Update() {
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 	} else {
 		// ビュープロジェクション行列の更新と転送
-		viewProjection_.UpdateMatrix();
+		cameraController_->Update();
+		viewProjection_.matView = cameraController_->GetViewProjection().matView;
+		viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
+		// ビュープロジェクション行列の転送
+		viewProjection_.TransferMatrix();
 	}
 }
 

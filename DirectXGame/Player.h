@@ -37,6 +37,8 @@ public:
 
 	LRDirection lrDirection_ = LRDirection::kRight;
 
+	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
