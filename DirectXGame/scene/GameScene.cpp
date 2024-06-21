@@ -152,6 +152,7 @@ void GameScene::Update() {
 	} else {
 		// ビュープロジェクション行列の更新と転送
 		cameraController_->Update();
+
 		viewProjection_.matView = cameraController_->GetViewProjection().matView;
 		viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
 		// ビュープロジェクション行列の転送
