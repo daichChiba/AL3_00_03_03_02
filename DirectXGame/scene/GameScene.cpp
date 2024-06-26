@@ -107,7 +107,7 @@ void GameScene::Initialize() {
 	cameraController_ = new CameraController();
 	// 初期化
 	cameraController_->Initialize();
-	// 追従対象をリセット
+	// 追従対象をセット
 	cameraController_->SetTarget(player_);
 	// リセット(瞬間合わせ)
 	cameraController_->Reset();
@@ -145,13 +145,15 @@ void GameScene::Update() {
 		// カメラの処理
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
+		// ビュープロジェクション行列の更新と転送
+		cameraController_->Update();
+
 		// デバックカメラのビュー行列
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		// デバックカメラのプロジェクション行列
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 	} else {
-		// ビュープロジェクション行列の更新と転送
-		cameraController_->Update();
+
 
 		viewProjection_.matView = cameraController_->GetViewProjection().matView;
 		viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
