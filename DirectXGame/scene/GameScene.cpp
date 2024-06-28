@@ -112,6 +112,10 @@ void GameScene::Initialize() {
 	// リセット(瞬間合わせ)
 	cameraController_->Reset();
 
+	//移動範囲の指定
+	Rect cameraArea = {12.0, 100.0f - 12.0f, 6.0f, 6.0f};
+	cameraController_->SetMovableArea(cameraArea);
+
 
 
 	// デバックカメラの生成
@@ -145,16 +149,15 @@ void GameScene::Update() {
 		// カメラの処理
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
-		// ビュープロジェクション行列の更新と転送
-		cameraController_->Update();
 
 		// デバックカメラのビュー行列
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		// デバックカメラのプロジェクション行列
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 	} else {
+		cameraController_->Update();
 
-
+		// ビュープロジェクション行列の更新と転送
 		viewProjection_.matView = cameraController_->GetViewProjection().matView;
 		viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
 		// ビュープロジェクション行列の転送
@@ -196,7 +199,7 @@ void GameScene::Draw() {
 			}
 			skydome_->Draw();
 			player_->Draw();
-			model3d_->Draw(*worldTransformBlock, debugCamera_->GetViewProjection());
+			model3d_->Draw(*worldTransformBlock, viewProjection_);
 		}
 	}
 
