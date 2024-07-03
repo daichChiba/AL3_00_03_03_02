@@ -39,6 +39,8 @@ public:
 
 	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
 
+	const Vector3& GetVelocity() const { return velocity_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -74,4 +76,6 @@ private:
 	static inline const float kLimitFallSpeed = { 0.5f };
 	//　ジャンプ加速（上方向）
 	static inline const float kJumpAcceleration = { 0.5f };
+
+	
 };
