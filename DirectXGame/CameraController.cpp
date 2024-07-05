@@ -21,6 +21,14 @@ void CameraController::Update() {
 	// 座標補間によりゆったり追従
 	viewProjection_.translation_ = Lerp(viewProjection_.translation_, targetCoordinates, kInterpolationRate);
 
+	//	追従対象が画面外に出ないように補正
+	viewProjection_.translation_.x = std::max(viewProjection_.translation_.x, targetCoordinates.x+ margin_.left);
+	viewProjection_.translation_.x = std::min(viewProjection_.translation_.x, targetCoordinates.x+margin_.right);
+	viewProjection_.translation_.y = std::max(viewProjection_.translation_.y, targetCoordinates.y+margin_.bottom);
+	viewProjection_.translation_.y = std::min(viewProjection_.translation_.y, targetCoordinates.y+margin_.top);
+
+
+
 	//移動範囲制限
 	viewProjection_.translation_.x = std::max(viewProjection_.translation_.x, movaArea_.left);
 	viewProjection_.translation_.x = std::min(viewProjection_.translation_.x, movaArea_.right);
