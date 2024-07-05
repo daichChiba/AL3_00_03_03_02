@@ -24,16 +24,32 @@ void Player::Initialize(Model* model, ViewProjection* viewProjection, const Vect
 // Updateの関数定義
 void Player::Update() {
 	// 移動入力
+	InputMove();
+
+	//旋回制御
+	AnimateTurn();
+	// 行列を定数バッファに転送
+	worldTransform_.UpdateMatrix();
+}
+
+// Drawの関数定義
+void Player::Draw() { model_->Draw(worldTransform_, *viewProjection_); }
+
+void Player::InputMove() {
+	// 着地フラグ
+	bool landing = false;
+
+	// 地面との当たり判定
+	// 下降中
+	if (velocity_.y < 0) {
+		// Y座標が地面以下になったら着地
+		if (worldTransform_.translation_.y <= 1.0f) {
+			landing = true;
+		}
+	}
 
 	// 接地状態
 	if (onGround_) {
-
-		// ジャンプ開始
-		if (velocity_.y > 0.0f) {
-			// 空中状態に移行
-			onGround_ = false;
-		}
-
 		Vector3 acceleration = {};
 
 		// 　左右移動操作
@@ -81,40 +97,35 @@ void Player::Update() {
 			// ジャンプ初速
 			velocity_ += Vector3(0, kJumpAcceleration, 0);
 		}
-
-		// 空中
+		// ジャンプ開始
+		if (velocity_.y > 0.0f) {
+			// 空中状態に移行
+			onGround_ = false;
+		}
 	} else {
+		// 着地
+		if (landing) {
+			// めり込み排斥
+			worldTransform_.translation_.y = 1.0f;
+			// 摩擦で横方向速度が減衰する
+			velocity_.x *= (1.0f - kAttenuation);
+			// 下方向速度がリセット
+			velocity_.y = 0.0f;
+			// 着地状態に移行
+			onGround_ = true;
+		}
+		// 空中
 		// 落下速度
 		velocity_ += Vector3(0, -kGravityAcceleration, 0);
 		// 落下速度制限
 		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
 	}
-
-	bool landing = false;
-
-	// 地面との当たり判定
-	// 下降中
-	if (velocity_.y < 0) {
-		// Y座標が地面以下になったら着地
-		if (worldTransform_.translation_.y <= 1.0f) {
-			landing = true;
-		}
-	}
-
-	// 着地
-	if (landing) {
-		// めり込み排斥
-		worldTransform_.translation_.y = 1.0f;
-		// 摩擦で横方向速度が減衰する
-		velocity_.x *= (1.0f - kAttenuation);
-		// 下方向速度がリセット
-		velocity_.y = 0.0f;
-		// 着地状態に移行
-		onGround_ = true;
-	}
-
 	// 移動
 	worldTransform_.translation_ += velocity_;
+}
+
+void Player::AnimateTurn() {
+	
 
 	// 旋回制御
 	if (turnTimer_ > 0.0f) {
@@ -130,12 +141,4 @@ void Player::Update() {
 
 		MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	}
-
-	// 行列を定数バッファに転送
-	worldTransform_.UpdateMatrix();
-}
-
-// Drawの関数定義
-void Player::Draw() { 
-	model_->Draw(worldTransform_, *viewProjection_);
 }

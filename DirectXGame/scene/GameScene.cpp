@@ -88,16 +88,19 @@ void GameScene::Initialize() {
 
 	skydome_ = new Skydome;
 
-	player_ = new Player; //
-	// 座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(7, 7);
-	player_->Initialize(modelPlayer_, &viewProjection_, playerPosition);
+
 
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
 	GenerateBlocks();
 
+	player_ = new Player; //
+	// 座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(7, 7);
+	player_->Initialize(modelPlayer_, &viewProjection_, playerPosition);
+
+	player_->SetMapChipField(mapChipField_);
 
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
