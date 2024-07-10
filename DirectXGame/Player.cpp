@@ -5,6 +5,7 @@
 #include "cassert"
 #include <algorithm>
 #include <numbers>
+#include "DebugText.h"
 
 // Initializeの関数定義
 void Player::Initialize(Model* model, ViewProjection* viewProjection, const Vector3& pos) {
@@ -26,6 +27,18 @@ void Player::Update() {
 	// 移動入力
 	InputMove();
 
+	//衝突情報を初期化
+	CollisionMapInfo collisionMapInfo;
+	//移動量に速度の値をコピー
+	collisionMapInfo.velocity = velocity_;
+
+	//マップ衝突チェック
+	CheckMapCollision(collisionMapInfo);
+	
+	//天井に接触している場合の処理
+	isHitCeiling(collisionMapInfo);
+
+
 	//旋回制御
 	AnimateTurn();
 	// 行列を定数バッファに転送
@@ -33,20 +46,12 @@ void Player::Update() {
 }
 
 // Drawの関数定義
-void Player::Draw() { model_->Draw(worldTransform_, *viewProjection_); }
+void Player::Draw() {
+	model_->Draw(worldTransform_, *viewProjection_);
+}
 
 void Player::InputMove() {
-	// 着地フラグ
-	bool landing = false;
 
-	// 地面との当たり判定
-	// 下降中
-	if (velocity_.y < 0) {
-		// Y座標が地面以下になったら着地
-		if (worldTransform_.translation_.y <= 1.0f) {
-			landing = true;
-		}
-	}
 
 	// 接地状態
 	if (onGround_) {
@@ -103,7 +108,25 @@ void Player::InputMove() {
 			onGround_ = false;
 		}
 	} else {
-		// 着地
+		// 空中
+		// 落下速度
+		velocity_ += Vector3(0, -kGravityAcceleration, 0);
+		// 落下速度制限
+		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
+	}
+
+	// 着地フラグ
+	bool landing = false;
+
+	// 地面との当たり判定
+	// 下降中
+	if (velocity_.y < 0) {
+		// Y座標が地面以下になったら着地
+		if (worldTransform_.translation_.y <= 1.0f) {
+			landing = true;
+		}
+	}
+	// 着地
 		if (landing) {
 			// めり込み排斥
 			worldTransform_.translation_.y = 1.0f;
@@ -114,12 +137,7 @@ void Player::InputMove() {
 			// 着地状態に移行
 			onGround_ = true;
 		}
-		// 空中
-		// 落下速度
-		velocity_ += Vector3(0, -kGravityAcceleration, 0);
-		// 落下速度制限
-		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
-	}
+
 	// 移動
 	worldTransform_.translation_ += velocity_;
 }
@@ -140,5 +158,85 @@ void Player::AnimateTurn() {
 		worldTransform_.rotation_.y = EaseInOut(destinationRotationY, turnFirstRotationY_, turnTimer_ / kTimeTurn);
 
 		MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	}
+}
+
+void Player::CheckMapCollision(CollisionMapInfo& info) {
+	CheckMapCollisionUp(info);
+	//CheckMapCollisionDown(info);
+	//CheckMapCollisionRight(info);
+	//CheckMapCollisionLeft(info);
+
+	// 移動
+	worldTransform_.translation_ += velocity_;
+}
+
+void Player::CheckMapCollisionUp(CollisionMapInfo& info) {
+	//移動後の4つの角の座標
+	std::array<Vector3, kNumCorner> positionNew;
+	for (uint32_t i = 0; i < positionNew.size(); ++i) {
+		positionNew[i] = CornerPosition(worldTransform_.translation_ + info.velocity, static_cast<Corner>(i));
+	}
+
+	//上昇あり？
+	if (info.velocity.y <= 0) {
+		return;
+	}
+
+	//移動後の4つの角の座標の計算
+	MapChipType mapChipType;
+	//真上の当たり判定を行う
+	bool isHit = false;
+	//左上の判定
+	MapChipField::IndexSet indexSet;
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kLeftTop]);
+	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
+	if (mapChipType==MapChipType::kBlock) {
+		isHit = true;
+	}
+	//右上点の判定
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightTop]);
+	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
+	if (mapChipType == MapChipType::kBlock) {
+		isHit = true;
+	}
+
+	//	ブロックにヒット？
+	if (isHit==true) {
+		//めり込みを排除する方向に移動量を設定する
+		indexSet = mapChipField_->GetMapChipIndexSetByPosition(worldTransform_.translation_ + Vector3(0, +kHeight / 2.0f, 0));
+		//めり込み先ブロックの範囲矩形
+		MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
+		info.velocity.y = std::max(0.0f, rect.bottom - worldTransform_.translation_.y - (kHeight / 2.0f + kBlank));
+		//天井に当たったことを記録する
+		info.isCeiling = true;
+	}
+
+}
+
+//void Player::CheckMapCollisionDown(CollisionMapInfo& info) {
+//}
+//
+//void Player::CheckMapCollisionRight(CollisionMapInfo& info) {
+//}
+//
+//void Player::CheckMapCollisionLeft(CollisionMapInfo& info) {}
+
+Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {
+	Vector3 offsetTable[kNumCorner] = {
+		{+kWidth / 2.0f, -kHeight / 2.0f, 0},	// kRightBottom
+		{-kWidth / 2.0f, -kHeight / 2.0f, 0},	// kLeftBottom
+		{+kWidth / 2.0f, +kHeight / 2.0f, 0},	// kRightTop
+		{-kWidth / 2.0f, +kHeight / 2.0f, 0},	// kLeftTop
+	};
+	return center + offsetTable[static_cast<uint32_t>(corner)];
+	
+}
+
+void Player::isHitCeiling(const CollisionMapInfo& info) {
+	//天井に当たった?
+	if (info.isCeiling == true) {
+		DebugText::GetInstance()->ConsolePrintf("hit ceiling\n");
+		velocity_.y = 0;
 	}
 }

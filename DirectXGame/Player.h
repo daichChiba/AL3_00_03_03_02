@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "MapChipField.h"
 
 
 class MapChipField;
@@ -10,6 +11,24 @@ class MapChipField;
 enum class LRDirection { 
 	kRight,
 	kLeft 
+};
+
+//マップとの当たり判定情報
+struct CollisionMapInfo {
+	bool isCeiling;
+	bool isLanding;
+	bool IsHitWall;
+	Vector3 velocity;
+};
+
+//角
+enum Corner {
+	kRightBottom,	//右下
+	kLeftBottom,	//左下
+	kRightTop,		//右上
+	kLeftTop,		//左上
+
+	kNumCorner		//要素数
 };
 
 /// <summary>
@@ -47,6 +66,15 @@ public:
 	void InputMove();
 
 	void AnimateTurn();
+
+	void CheckMapCollision(CollisionMapInfo& info);
+	void CheckMapCollisionUp(CollisionMapInfo& info);
+	//void CheckMapCollisionDown(CollisionMapInfo& info);
+	//void CheckMapCollisionRight(CollisionMapInfo& info);
+	//void CheckMapCollisionLeft(CollisionMapInfo& info);
+
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+	void isHitCeiling(const CollisionMapInfo& info);
 
 private:
 	// ワールド変換データ
@@ -91,6 +119,6 @@ private:
 	static inline const float kWidth = 0.8f;
 	static inline const float kHeight = 0.8f;
 
-
+	static inline const float kBlank = 2.0f;
 	
 };
