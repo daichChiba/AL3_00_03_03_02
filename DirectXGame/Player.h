@@ -75,6 +75,8 @@ public:
 
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
 	void isHitCeiling(const CollisionMapInfo& info);
+	
+	void collisionHitMove(const CollisionMapInfo& info);
 
 private:
 	// ワールド変換データ

@@ -34,6 +34,9 @@ void Player::Update() {
 
 	//マップ衝突チェック
 	CheckMapCollision(collisionMapInfo);
+
+	//衝突判定を反映して移動させる
+	collisionHitMove(collisionMapInfo);
 	
 	//天井に接触している場合の処理
 	isHitCeiling(collisionMapInfo);
@@ -167,8 +170,7 @@ void Player::CheckMapCollision(CollisionMapInfo& info) {
 	//CheckMapCollisionRight(info);
 	//CheckMapCollisionLeft(info);
 
-	// 移動
-	worldTransform_.translation_ += velocity_;
+
 }
 
 void Player::CheckMapCollisionUp(CollisionMapInfo& info) {
@@ -195,6 +197,7 @@ void Player::CheckMapCollisionUp(CollisionMapInfo& info) {
 		isHit = true;
 	}
 	//右上点の判定
+	//MapChipField::IndexSet indexSet_;
 	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightTop]);
 	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 	if (mapChipType == MapChipType::kBlock) {
@@ -239,4 +242,9 @@ void Player::isHitCeiling(const CollisionMapInfo& info) {
 		DebugText::GetInstance()->ConsolePrintf("hit ceiling\n");
 		velocity_.y = 0;
 	}
+}
+
+void Player::collisionHitMove(const CollisionMapInfo& info) {
+	// 移動
+	worldTransform_.translation_ += info.velocity;
 }
