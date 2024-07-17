@@ -69,7 +69,7 @@ public:
 
 	void CheckMapCollision(CollisionMapInfo& info);
 	void CheckMapCollisionUp(CollisionMapInfo& info);
-	//void CheckMapCollisionDown(CollisionMapInfo& info);
+	void CheckMapCollisionDown(CollisionMapInfo& info);
 	//void CheckMapCollisionRight(CollisionMapInfo& info);
 	//void CheckMapCollisionLeft(CollisionMapInfo& info);
 
@@ -77,6 +77,8 @@ public:
 	void isHitCeiling(const CollisionMapInfo& info);
 	
 	void collisionHitMove(const CollisionMapInfo& info);
+
+	void landingSwitch(const CollisionMapInfo& info);
 
 private:
 	// ワールド変換データ
@@ -112,7 +114,7 @@ private:
 	//　最大落下速度（下方向）
 	static inline const float kLimitFallSpeed = { 0.5f };
 	//　ジャンプ加速（上方向）
-	static inline const float kJumpAcceleration = { 0.5f };
+	static inline const float kJumpAcceleration = { 0.05f };
 
 	//マップチップによるフィールド
 	MapChipField* mapChipField_ = nullptr;
@@ -122,5 +124,8 @@ private:
 	static inline const float kHeight = 0.8f;
 
 	static inline const float kBlank = 2.0f;
+
+	static inline const float kAttenuationLanding = 0.005f;
+	static inline const float landShift=0.01f;
 	
 };
