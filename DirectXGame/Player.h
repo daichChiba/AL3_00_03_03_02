@@ -15,9 +15,9 @@ enum class LRDirection {
 
 //マップとの当たり判定情報
 struct CollisionMapInfo {
-	bool isCeiling;
-	bool isLanding;
-	bool IsHitWall;
+	bool isCeiling=false;
+	bool isLanding=false;
+	bool IsHitWall=false;
 	Vector3 velocity;
 };
 
@@ -114,7 +114,7 @@ private:
 	//　最大落下速度（下方向）
 	static inline const float kLimitFallSpeed = { 0.5f };
 	//　ジャンプ加速（上方向）
-	static inline const float kJumpAcceleration = { 0.05f };
+	static inline const float kJumpAcceleration = { 0.5f };
 
 	//マップチップによるフィールド
 	MapChipField* mapChipField_ = nullptr;
