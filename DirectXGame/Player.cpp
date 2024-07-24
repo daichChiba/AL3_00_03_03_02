@@ -35,11 +35,11 @@ void Player::Update() {
 	//マップ衝突チェック
 	CheckMapCollision(collisionMapInfo);
 
-	//衝突判定を反映して移動させる
-	collisionHitMove(collisionMapInfo);
-	
-	//天井に接触している場合の処理
-	isHitCeiling(collisionMapInfo);
+	////衝突判定を反映して移動させる
+	//collisionHitMove(collisionMapInfo);
+	//
+	////天井に接触している場合の処理
+	//isHitCeiling(collisionMapInfo);
 
 	//接地状態の切り替え
 	landingSwitch(collisionMapInfo);
@@ -306,18 +306,21 @@ void Player::landingSwitch(const CollisionMapInfo& info) {
 		bool isHit = false;
 		// 左下点の判定
 		MapChipField::IndexSet indexSet;
-		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kLeftBottom]);
+		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kLeftBottom] + Vector3(0, -landShift, 0));
 		mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 		if (mapChipType == MapChipType::kBlock) {
 			isHit = true;
 		}
 		// 右下点の判定
 		// MapChipField::IndexSet indexSet_;
-		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightBottom]);
+		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightBottom] + Vector3(0, -landShift, 0));
 		mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 		if (mapChipType == MapChipType::kBlock) {
 			isHit = true;
 		}
+
+
+
 
 		//落下なら空中状態に切り替え
 		if (!isHit) {
