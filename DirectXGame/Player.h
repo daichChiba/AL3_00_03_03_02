@@ -70,8 +70,8 @@ public:
 	void CheckMapCollision(CollisionMapInfo& info);
 	void CheckMapCollisionUp(CollisionMapInfo& info);
 	void CheckMapCollisionDown(CollisionMapInfo& info);
-	//void CheckMapCollisionRight(CollisionMapInfo& info);
-	//void CheckMapCollisionLeft(CollisionMapInfo& info);
+	void CheckMapCollisionRight(CollisionMapInfo& info);
+	void CheckMapCollisionLeft(CollisionMapInfo& info);
 
 	Vector3 CornerPosition(const Vector3& center, Corner corner);
 	void isHitCeiling(const CollisionMapInfo& info);
@@ -79,6 +79,8 @@ public:
 	void collisionHitMove(const CollisionMapInfo& info);
 
 	void landingSwitch(const CollisionMapInfo& info);
+
+	void isHitWall(const CollisionMapInfo& info);
 
 private:
 	// ワールド変換データ
@@ -126,6 +128,8 @@ private:
 	static inline const float kBlank = 2.0f;
 
 	static inline const float kAttenuationLanding = 0.005f;
-	static inline const float landShift=0.01f;
+	static inline const float landShift=0.1f;
+
+	static inline const float kAttenuationWall = 0.1f;
 	
 };

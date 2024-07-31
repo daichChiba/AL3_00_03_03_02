@@ -37,9 +37,9 @@ void GameScene::GenerateBlocks() {
 	uint32_t kNumBlockVirtical = mapChipField_->GetNumBlockVirtical();
 	uint32_t kNumBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
 
-	// ブロック１個分の横幅
-	const float kBlockWidth = 1.0f;
-	const float kBlockHeight = 1.0f;
+	//// ブロック１個分の横幅
+	//const float kBlockWidth = 1.0f;
+	//const float kBlockHeight = 1.0f;
 
 	// 要素数を変更する
 	worldTransformBlocks_.resize(kNumBlockVirtical);
@@ -52,8 +52,7 @@ void GameScene::GenerateBlocks() {
 			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
 				worldTransformBlocks_[i][j] = new WorldTransform();
 				worldTransformBlocks_[i][j]->Initialize();
-				worldTransformBlocks_[i][j]->translation_.x = kBlockWidth * j;
-				worldTransformBlocks_[i][j]->translation_.y = kBlockHeight * i;
+				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
 			}
 		}
 	}
