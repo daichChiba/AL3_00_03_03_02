@@ -13,6 +13,7 @@
 #include "Skydome.h"
 #include "MapChipField.h"
 #include "CameraController.h"
+#include "Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -93,5 +94,11 @@ private: // メンバ変数
 
 	//カメラコントローラ
 	CameraController* cameraController_;
+
+	//エネミー
+	Enemy* enemy_;
+
+	//エネミーモデル
+	Model* enemyModel_;
 
 };
