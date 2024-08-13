@@ -101,4 +101,7 @@ private: // メンバ変数
 	//エネミーモデル
 	Model* enemyModel_;
 
+	//すべての当たり判定を行う
+	void CheckAllCollisions();
+
 };

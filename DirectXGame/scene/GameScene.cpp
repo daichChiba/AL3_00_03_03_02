@@ -109,6 +109,11 @@ void GameScene::Initialize() {
 	enemy_ = new Enemy;
 	enemy_->Initialize(enemyModel_, &viewProjection_, enemyPosition);
 
+	//for (int32_t i = 0; i < 3; i++) {
+	//	Enemy* newEnemy = new Enemy();
+	//	Vector3 enemyPosition = { newEnemy->enemies_ = mapChipField_->GetMapChipPositionByIndex() }
+	//}
+
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
 
@@ -232,4 +237,29 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::CheckAllCollisions() {
+	#pragma region 自キャラと敵キャラの当たり判定
+	{
+		//判定対象1と2の座標
+		AABB aabb1, aabb2;
+
+		//自キャラの座標
+		aabb1 = player_->GetAABB();
+
+		//自キャラと敵弾すべての当たり判定
+		Enemy* enemy{};
+		aabb2 = enemy->GetAABB();
+
+		//AABB同士の交差判定
+		if (IsCollision(aabb1,aabb2)) {
+			//自キャラの衝突時コールバックを呼び出す
+			player_->OnCollision(enemy);
+			//敵弾の衝突時コールバックを呼び出す
+			enemy->OnCollision(player_);
+		}
+	}
+	#pragma endregion
+
 }

@@ -3,6 +3,7 @@
 #include <math.h>
 #include "Matrix4x4.h"
 #include "Vector3.h"
+#include "AABB.h"
 
 
 
@@ -13,6 +14,7 @@ Matrix4x4 MakeRotateXMatrix(float radian);
 Matrix4x4 MakeRotateYMatrix(float radian);
 Matrix4x4 MakeRotateZMatrix(float radian);
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
+bool IsCollision(const AABB& aabb1, const AABB& aabb2);
 
 float EaseInOut(float x1, float x2, float t);
 float Lerp(float x1, float x2, float t);

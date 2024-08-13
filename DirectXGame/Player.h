@@ -4,9 +4,11 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "MapChipField.h"
+#include "AABB.h"
 
 
 class MapChipField;
+class Enemy;
 
 enum class LRDirection { 
 	kRight,
@@ -81,6 +83,15 @@ public:
 	void landingSwitch(const CollisionMapInfo& info);
 
 	void isHitWall(const CollisionMapInfo& info);
+
+	//ワールド座標を取得
+	Vector3 GetWorldPosition();
+
+	//AABBを取得
+	AABB GetAABB();
+
+	//衝突応答
+	void OnCollision(const Enemy* enemy);
 
 private:
 	// ワールド変換データ
