@@ -80,6 +80,12 @@ private: // メンバ変数
 
 	std::vector <std::vector< WorldTransform* >> worldTransformBlocks_;
 
+	// エネミー
+	std::list<Enemy*> enemies_;
+
+	// エネミーモデル
+	Model* enemyModel_;
+
 	//スカイドーム3Dモデル
 	Model* modelSkydome_ = nullptr;
 
@@ -95,11 +101,7 @@ private: // メンバ変数
 	//カメラコントローラ
 	CameraController* cameraController_;
 
-	//エネミー
-	Enemy* enemy_;
 
-	//エネミーモデル
-	Model* enemyModel_;
 
 	//すべての当たり判定を行う
 	void CheckAllCollisions();

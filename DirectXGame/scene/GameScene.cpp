@@ -31,7 +31,11 @@ GameScene::~GameScene() {
 
 	delete cameraController_;
 
-	delete enemy_;
+	for (Enemy* enemy:enemies_) {
+		delete enemy;
+	}
+
+
 }
 
 void GameScene::GenerateBlocks() {
@@ -106,13 +110,16 @@ void GameScene::Initialize() {
 	//座標をマップチップ番号で指定
 	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(20, 18);
 
-	enemy_ = new Enemy;
-	enemy_->Initialize(enemyModel_, &viewProjection_, enemyPosition);
+	//enemy_ = new Enemy;
+	//enemy_->Initialize(enemyModel_, &viewProjection_, enemyPosition);
 
-	//for (int32_t i = 0; i < 3; i++) {
-	//	Enemy* newEnemy = new Enemy();
-	//	Vector3 enemyPosition = { newEnemy->enemies_ = mapChipField_->GetMapChipPositionByIndex() }
-	//}
+	for (int32_t i = 0; i < 3; ++i) {
+		Enemy* newEnemy = new Enemy();
+		Vector3 enemyPosition = {10 + i * 4.0f, 1, 0};
+		newEnemy->Initialize(enemyModel_, &viewProjection_, enemyPosition);
+
+		enemies_.push_back(newEnemy);
+	}
 
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
@@ -142,7 +149,10 @@ void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
 	//敵キャラの更新
-	enemy_->Update();
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
+	CheckAllCollisions();
 
 	// ブロックの更新
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
@@ -216,10 +226,13 @@ void GameScene::Draw() {
 			}
 			skydome_->Draw();
 			player_->Draw();
-			enemy_->Draw();
 			model3d_->Draw(*worldTransformBlock, viewProjection_);
 		}
 	}
+	for (Enemy* enemy : enemies_) {
+		enemy->Draw();
+	}
+
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -249,15 +262,17 @@ void GameScene::CheckAllCollisions() {
 		aabb1 = player_->GetAABB();
 
 		//自キャラと敵弾すべての当たり判定
-		Enemy* enemy{};
-		aabb2 = enemy->GetAABB();
+		for (Enemy*enemy:enemies_) {
+			aabb2 = enemy->GetAABB();
 
-		//AABB同士の交差判定
-		if (IsCollision(aabb1,aabb2)) {
-			//自キャラの衝突時コールバックを呼び出す
-			player_->OnCollision(enemy);
-			//敵弾の衝突時コールバックを呼び出す
-			enemy->OnCollision(player_);
+			// AABB同士の交差判定
+			if (IsCollision(aabb1, aabb2)) {
+				// 自キャラの衝突時コールバックを呼び出す
+				player_->OnCollision(enemy);
+				// 敵弾の衝突時コールバックを呼び出す
+				enemy->OnCollision(player_);
+			}
+
 		}
 	}
 	#pragma endregion
