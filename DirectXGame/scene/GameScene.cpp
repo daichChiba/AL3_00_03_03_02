@@ -107,8 +107,6 @@ void GameScene::Initialize() {
 
 	player_->SetMapChipField(mapChipField_);
 
-	//座標をマップチップ番号で指定
-	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(20, 18);
 
 	//enemy_ = new Enemy;
 	//enemy_->Initialize(enemyModel_, &viewProjection_, enemyPosition);
