@@ -35,6 +35,9 @@ GameScene::~GameScene() {
 		delete enemy;
 	}
 
+	if(isDeathParticle){
+		delete deathParticles_;
+	}
 
 }
 
@@ -95,6 +98,8 @@ void GameScene::Initialize() {
 
 	enemyModel_ = Model::CreateFromOBJ("enemy", true);
 
+	deathParticleModel_ = Model::CreateFromOBJ("deathParticle", true);
+
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
@@ -118,6 +123,10 @@ void GameScene::Initialize() {
 
 		enemies_.push_back(newEnemy);
 	}
+
+	//	仮の生成処理。後で消す。
+	deathParticles_ = new DeathParticles;
+	deathParticles_->Initialize(deathParticleModel_, &viewProjection_, playerPosition);
 
 	// 　天球の生成
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
@@ -151,6 +160,10 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 	CheckAllCollisions();
+
+	if (isDeathParticle) {
+		deathParticles_->Update();
+	}
 
 	// ブロックの更新
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
@@ -229,6 +242,10 @@ void GameScene::Draw() {
 	}
 	for (Enemy* enemy : enemies_) {
 		enemy->Draw();
+	}
+
+	if (isDeathParticle) {
+		deathParticles_->Draw();
 	}
 
 

@@ -14,6 +14,7 @@
 #include "MapChipField.h"
 #include "CameraController.h"
 #include "Enemy.h"
+#include "DeathParticles.h"
 
 /// <summary>
 /// ゲームシーン
@@ -101,6 +102,13 @@ private: // メンバ変数
 	//カメラコントローラ
 	CameraController* cameraController_;
 
+	//デスパーティクル
+	DeathParticles* deathParticles_ = nullptr;
+
+	// エネミーモデル
+	Model* deathParticleModel_;
+
+	bool isDeathParticle=true;
 
 
 	//すべての当たり判定を行う

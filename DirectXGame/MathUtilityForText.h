@@ -36,5 +36,5 @@ Vector3& operator*=(Vector3& v, float s);
 // Vector3の掛け算
 const Vector3 operator*(const Vector3& v, float s);
 
-
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
