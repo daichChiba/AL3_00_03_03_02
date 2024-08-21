@@ -26,6 +26,11 @@ void TitleScene::Initialize() {
 	worldTransformFont_.Initialize();
 	worldTransformPlayer_.Initialize();
 
+	worldTransformFont_.translation_.y = 10;
+	worldTransformPlayer_.translation_.y = -8;
+	worldTransformFont_.scale_ = {2, 2, 2};
+	worldTransformPlayer_.scale_ = {8, 8, 8};
+	worldTransformPlayer_.rotation_.y = std::numbers::pi_v<float>;
 
 }
 
@@ -33,7 +38,15 @@ void TitleScene::Update() {
 	if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 		finished_ = true;
 	}
+	// タイマーを加算
+	timer_ += 1.0f / 60.0f;
 
+	worldTransformPlayer_.rotation_.y =
+		std::numbers::pi_v<float> + std::sin(std::numbers::pi_v<float> * 2.0f * timer_ / kMotionTime);
+
+	// 行列を更新
+	worldTransformFont_.UpdateMatrix();
+	worldTransformPlayer_.UpdateMatrix();
 }
 
 void TitleScene::Draw() {

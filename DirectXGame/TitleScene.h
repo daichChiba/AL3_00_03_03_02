@@ -60,4 +60,6 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	float timer_ = 0.0f;
+	static inline const float kMotionTime = 1.0f;
 };

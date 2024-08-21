@@ -152,7 +152,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 void ChangeScene() {
 	switch (scene) {
 	case Scene::kTitle:
-		if (titleScene) {
+		if (titleScene->IsFinished()) {
 			//シーン変更
 			scene = Scene::kGame;
 			//旧シーンの開放
@@ -164,7 +164,7 @@ void ChangeScene() {
 		}
 		break;
 	case Scene::kGame:
-		if (gameScene) {
+		if (gameScene->IsFinished()) {
 			// シーン変更
 			scene = Scene::kTitle;
 			// 旧シーンの開放
