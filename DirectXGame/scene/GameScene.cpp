@@ -371,6 +371,11 @@ void GameScene::ChangePhase() {
 			viewProjection_.TransferMatrix();
 		}
 
+		if (deathParticles_ && deathParticles_->IsFinished()) {
+
+			finished_ = true;
+		}
+
 		break;
 	}
 }

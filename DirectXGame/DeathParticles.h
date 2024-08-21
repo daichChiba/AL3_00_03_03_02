@@ -32,6 +32,9 @@ public:
 	/// <summary>
 	void Draw();
 
+	// デスフラグのgetter
+	bool IsFinished() const { return isFinished_; }
+
 private:
 	// モデル
 	Model* model_ = nullptr;
