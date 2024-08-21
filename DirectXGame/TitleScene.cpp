@@ -9,12 +9,31 @@ TitleScene::~TitleScene() {
 	delete modelPlayer_;
 }
 
-void TitleScene::Initialize() {}
+void TitleScene::Initialize() {
+
+	dxCommon_ = DirectXCommon::GetInstance();
+	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
+
+
+
+// ビュープロジェクション
+	viewProjection_.Initialize();
+
+	modelFont_ = Model::CreateFromOBJ("titleFont");
+	modelPlayer_ = Model::CreateFromOBJ("player");
+
+	worldTransformFont_.Initialize();
+	worldTransformPlayer_.Initialize();
+
+
+}
 
 void TitleScene::Update() {
 	if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 		finished_ = true;
 	}
+
 }
 
 void TitleScene::Draw() {
