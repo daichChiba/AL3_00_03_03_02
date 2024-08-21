@@ -72,6 +72,9 @@ void GameScene::Initialize() {
 	//// ファイル名を指定してテクスチャを読み込む
 	// textureHandle_ = TextureManager::Load("chopper.png");
 
+	//ゲームプレイフェーズから開始
+	phase_ = Phase::kPlay;
+
 	// 3Dモデルの作成
 	model_ = Model::Create();
 
@@ -153,54 +156,11 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	// 自キャラの更新
-	player_->Update();
-	//敵キャラの更新
-	for (Enemy* enemy : enemies_) {
-		enemy->Update();
-	}
-	CheckAllCollisions();
 
-	if (isDeathParticle) {
-		deathParticles_->Update();
-	}
 
-	// ブロックの更新
-	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-			// 04/24 02_02の更新から始める
+	ChangePhase();
 
-			if (!worldTransformBlock) {
-				continue;
-			}
 
-			worldTransformBlock->UpdateMatrix();
-		}
-	}
-	skydome_->Update();
-
-#ifdef _DEBUG
-	if (input_->TriggerKey(DIK_0)) {
-		isDebugCameraActive_ = !isDebugCameraActive_;
-	}
-#endif	// DEBUG
-		// カメラの処理
-	if (isDebugCameraActive_) {
-		debugCamera_->Update();
-
-		// デバックカメラのビュー行列
-		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		// デバックカメラのプロジェクション行列
-		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
-	} else {
-		cameraController_->Update();
-
-		// ビュープロジェクション行列の更新と転送
-		viewProjection_.matView = cameraController_->GetViewProjection().matView;
-		viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
-		// ビュープロジェクション行列の転送
-		viewProjection_.TransferMatrix();
-	}
 }
 
 void GameScene::Draw() {
@@ -236,7 +196,10 @@ void GameScene::Draw() {
 				continue;
 			}
 			skydome_->Draw();
-			player_->Draw();
+			// プレイヤーの描画処理
+			if (phase_ == Phase::kPlay) {
+				player_->Draw();
+			}
 			model3d_->Draw(*worldTransformBlock, viewProjection_);
 		}
 	}
@@ -292,4 +255,122 @@ void GameScene::CheckAllCollisions() {
 	}
 	#pragma endregion
 
+}
+
+void GameScene::ChangePhase() {
+
+
+		switch (phase_) {
+	case GameScene::Phase::kPlay:
+		// 自キャラの更新
+		player_->Update();
+		// 敵キャラの更新
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+		CheckAllCollisions();
+
+		// ブロックの更新
+		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+				// 04/24 02_02の更新から始める
+
+				if (!worldTransformBlock) {
+					continue;
+				}
+
+				worldTransformBlock->UpdateMatrix();
+			}
+		}
+		skydome_->Update();
+
+#ifdef _DEBUG
+		if (input_->TriggerKey(DIK_0)) {
+			isDebugCameraActive_ = !isDebugCameraActive_;
+		}
+#endif // DEBUG
+       // カメラの処理
+		if (isDebugCameraActive_) {
+			debugCamera_->Update();
+
+			// デバックカメラのビュー行列
+			viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+			// デバックカメラのプロジェクション行列
+			viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		} else {
+			cameraController_->Update();
+
+			// ビュープロジェクション行列の更新と転送
+			viewProjection_.matView = cameraController_->GetViewProjection().matView;
+			viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
+			// ビュープロジェクション行列の転送
+			viewProjection_.TransferMatrix();
+		}
+
+		if (player_->IsDead() == true) {
+			// 死亡演出フェーズに切り替え
+			phase_ = Phase::kDeath;
+
+			// 自キャラの座標を取得
+			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+
+
+
+			deathParticleModel_ = Model::CreateFromOBJ("deathParticle", true);
+
+			deathParticles_ = new DeathParticles;
+			deathParticles_->Initialize(deathParticleModel_, &viewProjection_, deathParticlesPosition);
+		}
+
+
+		break;
+	case GameScene::Phase::kDeath:
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+
+		// ブロックの更新
+		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+				// 04/24 02_02の更新から始める
+
+				if (!worldTransformBlock) {
+					continue;
+				}
+
+				worldTransformBlock->UpdateMatrix();
+			}
+		}
+
+		if (isDeathParticle) {
+			deathParticles_->Update();
+		}
+
+		skydome_->Update();
+
+#ifdef _DEBUG
+		if (input_->TriggerKey(DIK_0)) {
+			isDebugCameraActive_ = !isDebugCameraActive_;
+		}
+#endif // DEBUG
+       // カメラの処理
+		if (isDebugCameraActive_) {
+			debugCamera_->Update();
+
+			// デバックカメラのビュー行列
+			viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+			// デバックカメラのプロジェクション行列
+			viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		} else {
+			cameraController_->Update();
+
+			// ビュープロジェクション行列の更新と転送
+			viewProjection_.matView = cameraController_->GetViewProjection().matView;
+			viewProjection_.matProjection = cameraController_->GetViewProjection().matProjection;
+			// ビュープロジェクション行列の転送
+			viewProjection_.TransferMatrix();
+		}
+
+		break;
+	}
 }

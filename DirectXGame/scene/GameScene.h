@@ -114,4 +114,15 @@ private: // メンバ変数
 	//すべての当たり判定を行う
 	void CheckAllCollisions();
 
+	//ゲームのフェーズ(型)
+	enum class Phase {
+		kPlay,	//ゲームプレイ
+		kDeath,	//デス演出
+	};
+
+	//ゲームの現在フェーズ(変数)
+	Phase phase_;
+
+	void ChangePhase();
+
 };
