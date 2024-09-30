@@ -1,3 +1,4 @@
+#define DIRECTINPUT_VERSION		0x0800	//DirectInputのバージョン指定
 #include "Audio.h"
 #include "AxisIndicator.h"
 #include "DirectXCommon.h"
@@ -7,6 +8,11 @@
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "TitleScene.h"
+
+#include <dinput.h>
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
 
 GameScene* gameScene = nullptr;
 TitleScene* titleScene = nullptr;
@@ -29,6 +35,8 @@ void DrawScene();
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* win = nullptr;
+
+
 	DirectXCommon* dxCommon = nullptr;
 	// 汎用機能
 	Input* input = nullptr;
@@ -44,6 +52,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(win);
+
+	// DirectInputの初期化
+	HRESULT result;
+	IDirectInput8* directInput = nullptr;
+	result = DirectInput8Create(win->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	assert(SUCCEEDED(result));
+
+	// キーボードデバイスの生成
+	IDirectInputDevice8* keyboard = nullptr;
+	result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	assert(SUCCEEDED(result));
+
+	// 入力データ形式のセット
+	result = keyboard->SetDataFormat(&c_dfDIKeyboard); // 標準形式
+	assert(SUCCEEDED(result));
+
+	// 排他制御レベルのセット
+	result = keyboard->SetCooperativeLevel(win->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(result));
+
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
@@ -93,10 +121,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 
+		//DirectX毎フレーム処理
+		//キーボード情報の取得開始
+		keyboard->Acquire();
+
+		// 全キーの入力状態を取得する
+		BYTE key[256] = {};
+		keyboard->GetDeviceState(sizeof(key), key);
+
 		// ImGui受付開始
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
+
+		//数字の0キーが押されたら
+		if (key[DIK_0]) {
+			OutputDebugStringA("Hit 0\n");//出力ウィンドウに「Hit 0」と表示
+		}
+
 		// ゲームシーンの毎フレーム処理
 		//gameScene->Update();
 
