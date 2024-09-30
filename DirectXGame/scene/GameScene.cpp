@@ -104,7 +104,7 @@ void GameScene::Initialize() {
 	deathParticleModel_ = Model::CreateFromOBJ("deathParticle", true);
 
 	mapChipField_ = new MapChipField;
-	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+	mapChipField_->LoadMapChipCsv("Resources/blocks_csv/blocks.csv");
 
 	GenerateBlocks();
 
