@@ -260,7 +260,7 @@ void GameScene::CheckAllCollisions() {
 void GameScene::ChangePhase() {
 
 
-		switch (phase_) {
+	switch (phase_) {
 	case GameScene::Phase::kPlay:
 		// 自キャラの更新
 		player_->Update();
